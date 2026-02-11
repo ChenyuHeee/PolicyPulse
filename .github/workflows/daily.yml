@@ -1,6 +1,6 @@
 name: Daily crawl and deploy
 
-on:
+"on":
   schedule:
     - cron: "0 1 * * *"
   workflow_dispatch:
