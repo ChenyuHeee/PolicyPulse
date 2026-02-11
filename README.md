@@ -1,41 +1,93 @@
-# PolicyPulse (PolicyPulse)
+# PolicyPulse · 金源观潮
 
-PolicyPulse is a GitHub-native, fully automated financial news aggregation site. It crawls official sources daily, stores data inside the repo, builds a static site, and deploys to GitHub Pages.
+[![Daily crawl and deploy](https://github.com/ChenyuHeee/PolicyPulse/actions/workflows/daily.yml/badge.svg)](https://github.com/ChenyuHeee/PolicyPulse/actions/workflows/daily.yml)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-online-success)](https://chenyuheee.github.io/PolicyPulse/)
+[![Last commit](https://img.shields.io/github/last-commit/ChenyuHeee/PolicyPulse)](https://github.com/ChenyuHeee/PolicyPulse/commits/main)
+[![Stars](https://img.shields.io/github/stars/ChenyuHeee/PolicyPulse?style=social)](https://github.com/ChenyuHeee/PolicyPulse)
 
-## Features
+PolicyPulse 是一个 **GitHub 原生** 的金融政策/宏观信息聚合站：每天由 GitHub Actions 自动抓取官方源，数据直接落在仓库里（JSONL），随后构建静态站并部署到 GitHub Pages。
 
-- Daily scheduled crawl with GitHub Actions (manual trigger supported)
-- Source-by-source adapters with clean logs and graceful failure handling
-- JSONL storage inside the repo with stable IDs and deduplication
-- Astro + TailwindCSS static site, mobile friendly
-- Zero external servers or databases
+在线预览： https://chenyuheee.github.io/PolicyPulse/
 
-## Repository layout
+## 目录
 
-- `crawler/` Python crawler and validator
-- `data/` JSONL data and index
-- `site/` Astro static site
-- `.github/workflows/daily.yml` automation pipeline
+- [核心特性](#核心特性)
+- [站点页面](#站点页面)
+- [仓库结构](#仓库结构)
+- [快速开始](#快速开始)
+- [数据格式](#数据格式)
+- [配置新闻源](#配置新闻源)
+- [自动化与部署](#自动化与部署)
+- [可选 Secrets](#可选-secrets)
+- [常见问题](#常见问题)
+- [贡献](#贡献)
 
-## Data schema (JSONL)
+## 核心特性
 
-Each line in `data/news.jsonl` is a JSON object with the following fields:
+- **低运维**：无需数据库/服务器，数据直接 commit 到仓库
+- **全自动**：定时（可手动）抓取 → 校验 → 有变化才提交 → 构建 → Pages 部署
+- **信息密度导向**：面向金融从业者的紧凑排版，移动端可用
+- **可扩展**：每个来源一个 adapter，RSS/HTML/API 均可接入
 
-- `id` (string, required): sha256 of `source_id + canonical_url`
-- `source_id` (string, required)
-- `source_name` (string, required)
-- `title` (string, required)
-- `url` (string, required)
-- `canonical_url` (string, required)
-- `published_at` (string, required, ISO 8601)
-- `fetched_at` (string, required, ISO 8601)
-- `summary` (string, optional)
-- `keywords` (array of strings, optional)
-- `content_type` (string, optional)
-- `language` (string, optional)
-- `region` (string, optional)
+## 站点页面
 
-Example:
+- Latest：按时间线浏览最新条目
+- Sources：按来源浏览与追踪
+- Topics：按议题（宏观、利率、外汇、财政、监管等）聚合
+
+## 仓库结构
+
+- `crawler/`：Python 爬虫与校验
+- `data/`：数据落盘（`news.jsonl`）与索引（`index.json`）
+- `site/`：Astro + Tailwind 的静态站
+- `.github/workflows/daily.yml`：自动化流水线（抓取+构建+部署）
+- `docs/`：规划与来源说明
+  - `docs/网站规划.md`
+  - `docs/新闻源与获取方式.md`
+
+## 快速开始
+
+### 1) Python 环境
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
+```
+
+### 2) 运行爬虫与校验
+
+```bash
+python -m crawler crawl
+python -m crawler validate
+```
+
+自定义数据路径：
+
+```bash
+python -m crawler crawl --data data/news.jsonl --index data/index.json
+python -m crawler validate --data data/news.jsonl
+```
+
+### 3) 本地启动站点
+
+```bash
+cd site
+npm install
+npm run dev
+```
+
+## 数据格式
+
+`data/news.jsonl` 每一行是一条 JSON 记录，字段示例：
+
+- `id`：`sha256(source_id + canonical_url)`
+- `source_id` / `source_name`
+- `title` / `url` / `canonical_url`
+- `published_at` / `fetched_at`（ISO 8601）
+- `summary` / `keywords` / `content_type` / `language` / `region`
+
+示例：
 
 ```json
 {
@@ -55,96 +107,48 @@ Example:
 }
 ```
 
-## Local usage
+## 配置新闻源
 
-### 1) Set up Python
+- 各来源 adapter：`crawler/sources/`
+- 运行时配置（启用/禁用、URL、选择器、API 端点等）：`crawler/sources_config.yaml`
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -e .
-```
+### 默认启用的来源（以 `crawler/sources_config.yaml` 为准）
 
-### 2) Run crawler
+当前默认启用覆盖中美欧英的典型官方源（HTML/RSS）：
 
-```bash
-python -m crawler crawl
-python -m crawler validate
-```
+- PBoC（人民银行）
+- SAFE（外汇局）
+- CSRC（证监会）
+- MOF（财政部/国务院）
+- NBS（国家统计局）
+- Federal Reserve（美联储 RSS）
+- ECB（欧洲央行 RSS）
+- BoE（英格兰银行 RSS）
+- BIS（国际清算银行 RSS）
 
-Custom paths:
+启用一个来源：编辑 `crawler/sources_config.yaml`，将对应 `enabled: true`，并按需要补全配置项。
 
-```bash
-python -m crawler crawl --data data/news.jsonl --index data/index.json
-python -m crawler validate --data data/news.jsonl
-```
+## 自动化与部署
 
-Data files will update in `data/`.
+工作流：`.github/workflows/daily.yml`
 
-### 3) Run the site
+默认流程：
 
-```bash
-cd site
-npm install
-npm run dev
-```
+1. crawl + validate
+2. 仅在 `data/` 变化时提交
+3. 构建 Astro 静态站
+4. 部署到 GitHub Pages
 
-## Configure sources
+### GitHub Pages 设置
 
-Source definitions live in `crawler/sources/` (one module per source). Runtime settings and enabling live in `crawler/sources_config.yaml`.
+1. 仓库 Settings → Pages
+2. Source 选择 “GitHub Actions”
 
-### Enabled sources (default)
+本仓库为 **项目页（project pages）**，构建时会用 `BASE_PATH` 适配 `/PolicyPulse/` 这样的 base path。
 
-- China Securities Regulatory Commission (CSRC) news
-  - List page: https://www.csrc.gov.cn/csrc/c100028/common_list.shtml
-- Ministry of Finance (MOF) policy releases
-  - List page: https://www.mof.gov.cn/zhengwuxinxi/zhengcefabu/
-- Bank for International Settlements (BIS) press releases (RSS)
-  - Feed: https://www.bis.org/doclist/all_pressrels.rss
-- State Administration of Foreign Exchange (SAFE) news
-  - List page: https://www.safe.gov.cn/safe/whxw/index.html
-- People's Bank of China (PBoC) news
-  - List page: https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html
-- Bank of England (BoE) news (RSS)
-  - Feed: https://www.bankofengland.co.uk/rss/news
-  - Source index: https://www.bankofengland.co.uk/rss
-- European Central Bank (ECB) press releases, speeches, and interviews (RSS)
-  - Feed: https://www.ecb.europa.eu/rss/press.html
-- Federal Reserve press releases (RSS)
-  - Feed: https://www.federalreserve.gov/feeds/press_all.xml
-  - Source index: https://www.federalreserve.gov/feeds/default.htm
-- National Bureau of Statistics of China (NBS) data releases (HTML list)
-  - List page: https://www.stats.gov.cn/sj/zxfb/
-  - Rationale: official “数据发布” list with stable list entries and dates
+## 可选 Secrets
 
-To enable a source:
-
-1. Open `crawler/sources_config.yaml`
-2. Set `enabled: true` for the source
-3. Fill in adapter config (feed URLs, endpoints, selectors, etc.)
-4. Add secrets if required (see below)
-
-To add a new source:
-
-1. Create a new source module in `crawler/sources/`
-2. Add it to `crawler/sources/registry.py`
-3. Add a config block in `crawler/sources_config.yaml`
-4. Implement the adapter config (RSS, HTML, or API)
-
-## GitHub Actions
-
-The workflow `.github/workflows/daily.yml` runs daily at 01:00 UTC and supports manual trigger.
-
-It performs:
-
-1. Crawl and validate data
-2. Commit `data/` changes (only if changed)
-3. Build Astro site
-4. Deploy to GitHub Pages
-
-## Secrets
-
-Some sources require API keys or a compliant User-Agent. Configure these in GitHub Secrets:
+部分 API 来源（默认禁用）需要 key 或合规 UA，可在 GitHub Secrets 配置：
 
 - `FRED_API_KEY`
 - `BLS_API_KEY`
@@ -152,39 +156,16 @@ Some sources require API keys or a compliant User-Agent. Configure these in GitH
 - `EIA_API_KEY`
 - `SEC_USER_AGENT`
 
-If a required secret is missing, the crawler will skip that source and continue.
+如果缺少所需 secret，对应来源会被跳过但不会中断全局流程。
 
-## API keys / How to obtain
+## 常见问题
 
-- FRED (`FRED_API_KEY`): https://fred.stlouisfed.org/docs/api/api_key.html
-- BLS (`BLS_API_KEY`): https://www.bls.gov/developers/ (registration: https://data.bls.gov/registrationEngine/)
-- BEA (`BEA_API_KEY`): https://apps.bea.gov/API/signup/
-- EIA (`EIA_API_KEY`): https://www.eia.gov/opendata/register.php
-- SEC User-Agent (`SEC_USER_AGENT`): must include contact info per SEC policy
-  - Policy: https://www.sec.gov/os/accessing-edgar-data
+### 为什么有些来源默认禁用？
 
-## Disabled sources (API-first in this iteration)
+- API 来源：需要 key、速率限制与稳定性评估（例如 FRED/BLS/BEA/EIA/SEC 等）
+- JS 渲染页面：不引入 headless 浏览器的前提下难以稳定抓取（例如部分交易所披露页）
+- 特殊情况：IEA 在 GitHub hosted runner 上常见 HTTP 403，因此默认禁用（可自行本地/自托管 runner 运行）
 
-- NFRA, FRED, BLS, BEA, EIA, Treasury, SEC EDGAR, IMF/World Bank/OECD: disabled because this iteration skips API-based ingestion. Planned next step is to wire each API once keys/UA are available and rate limits are understood.
-  - NFRA list API: https://www.nfra.gov.cn/cbircweb/DocInfo/SelectDocByItemIdAndChild
-  - Treasury API docs: https://fiscaldata.treasury.gov/api-documentation/
-  - SEC EDGAR API docs: https://www.sec.gov/edgar/sec-api-documentation
-  - IMF SDMX REST: https://dataservices.imf.org/REST/SDMX_JSON.svc/
-  - World Bank API: https://datahelpdesk.worldbank.org/knowledgebase/articles/889392-about-the-indicators-api-documentation
-  - OECD SDMX-JSON: https://stats.oecd.org/SDMX-JSON/
+## 贡献
 
-## Disabled sources (HTML/RSS not stable)
-
-- SSE, SZSE, BSE: primary disclosure pages are JS-rendered and rely on internal JSON endpoints. We avoid headless browsers in this repo, so these stay disabled until stable RSS or documented JSON endpoints are added.
-- IEA: returns HTTP 403 on GitHub-hosted runners, so it is disabled by default.
-
-## Enable GitHub Pages
-
-1. Go to Repository Settings -> Pages
-2. Set Source to "GitHub Actions"
-3. Save
-
-## Notes
-
-- No external database is used; all data is committed to the repo.
-- Default retention is disabled (full history). You can enable retention in `crawler/sources_config.yaml` if desired.
+欢迎提 PR：新增官方来源、改进分类/页面信息架构、优化抓取稳定性与日志。
