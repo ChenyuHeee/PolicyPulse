@@ -1,5 +1,22 @@
 ---
 const { item, density = "card", topics = [], eventTypeLabel = "" } = Astro.props;
+
+const SOURCE_SHORT_LABELS: Record<string, string> = {
+  pboc: "PBOC",
+  safe: "SAFE",
+  csrc: "CSRC",
+  nfra: "NFRA",
+  mof_state_council: "MOF",
+  mof: "MOF",
+  nbs: "NBS",
+  ecb: "ECB",
+  boe: "BOE",
+  federal_reserve: "FED",
+  bis: "BIS",
+};
+const sourceFullName = item.source_name || item.source_id || "";
+const sourceShort = SOURCE_SHORT_LABELS[String(item.source_id || "").toLowerCase()] || sourceFullName;
+
 const published = new Date(item.published_at).toLocaleString("zh-CN", {
   year: "numeric",
   month: "2-digit",
@@ -24,14 +41,6 @@ const metaLine = metaParts.join(" · ");
   <article class="border-b border-ink-900/10 py-2">
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <span class="text-[11px] text-ink-900/60 tabular-nums">{published}</span>
-      {item.source_name && (
-        <span
-          class="max-w-28 truncate rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ink-900/70 sm:max-w-40"
-          title={item.source_name}
-        >
-          {item.source_name}
-        </span>
-      )}
       {eventTypeLabel && (
         <span class="rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] text-ink-900/70">
           {eventTypeLabel}
@@ -46,10 +55,18 @@ const metaLine = metaParts.join(" · ");
         {item.title}
       </a>
     </div>
-    {(topics.length > 0 || metaLine || item.summary) && (
-      <div class="mt-1 hidden lg:flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink-900/60">
-        {topics.length > 0 && <span>{topics.join(" · ")}</span>}
-        {metaLine && <span>{metaLine}</span>}
+    {(sourceFullName || topics.length > 0 || metaLine || item.summary) && (
+      <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink-900/60">
+        {sourceFullName && (
+          <span
+            class="max-w-28 truncate rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ink-900/70 sm:max-w-40"
+            title={sourceFullName}
+          >
+            {sourceShort}
+          </span>
+        )}
+        {topics.length > 0 && <span class="hidden md:inline">{topics.join(" · ")}</span>}
+        {metaLine && <span class="hidden lg:inline">{metaLine}</span>}
         {item.summary && <span class="hidden xl:inline line-clamp-1">{item.summary}</span>}
       </div>
     )}
