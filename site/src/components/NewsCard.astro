@@ -25,7 +25,10 @@ const metaLine = metaParts.join(" · ");
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <span class="text-[11px] text-ink-900/60 tabular-nums">{published}</span>
       {item.source_name && (
-        <span class="rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ink-900/70">
+        <span
+          class="max-w-28 truncate rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ink-900/70 sm:max-w-40"
+          title={item.source_name}
+        >
           {item.source_name}
         </span>
       )}
