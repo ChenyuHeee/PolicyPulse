@@ -1,5 +1,7 @@
 # PolicyPulse · 金源观潮
 
+> 说明：本仓库开源内容仅供学习与研究用途，不构成任何投资建议、交易建议或法律意见；使用者应自行评估风险并遵守相关法律法规与各信息源网站条款。
+
 [![Daily crawl and deploy](https://github.com/ChenyuHeee/PolicyPulse/actions/workflows/daily.yml/badge.svg)](https://github.com/ChenyuHeee/PolicyPulse/actions/workflows/daily.yml)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-online-success)](https://chenyuheee.github.io/PolicyPulse/)
 [![Last commit](https://img.shields.io/github/last-commit/ChenyuHeee/PolicyPulse)](https://github.com/ChenyuHeee/PolicyPulse/commits/main)
