@@ -2,7 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import NewsCard from "../../components/NewsCard.astro";
 import Pagination from "../../components/Pagination.astro";
-import { getNewsPage } from "../../lib/news";
+import { classifyTopics, getNewsPage, TOPIC_LABELS } from "../../lib/news";
 
 export function getStaticPaths() {
   const firstPage = getNewsPage(1);
@@ -31,7 +31,11 @@ const { items, totalPages, currentPage, totalItems } = getNewsPage(page);
     ) : (
       <div class="mt-6">
         {items.map((item) => (
-          <NewsCard item={item} density="compact" />
+          <NewsCard
+            item={item}
+            density="compact"
+            topics={classifyTopics(item).map((t) => TOPIC_LABELS[t])}
+          />
         ))}
       </div>
     )}

@@ -1,5 +1,5 @@
 ---
-const { item, density = "card" } = Astro.props;
+const { item, density = "card", topics = [] } = Astro.props;
 const published = new Date(item.published_at).toLocaleString("zh-CN", {
   year: "numeric",
   month: "2-digit",
@@ -27,6 +27,7 @@ const metaLine = metaParts.join(" · ");
         {item.source_name}
       </span>
       <span>{published}</span>
+      {topics.length > 0 && <span class="hidden md:inline">{topics.join(" · ")}</span>}
       {metaLine && <span class="hidden sm:inline">{metaLine}</span>}
     </div>
     <h3 class="mt-2 text-sm font-medium text-ink-950">

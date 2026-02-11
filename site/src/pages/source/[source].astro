@@ -1,7 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import NewsCard from "../../components/NewsCard.astro";
-import { loadNews } from "../../lib/news";
+import { classifyTopics, loadNews, TOPIC_LABELS } from "../../lib/news";
 
 export function getStaticPaths() {
   const items = loadNews();
@@ -27,7 +27,11 @@ const sourceName = items[0]?.source_name || sourceId;
     ) : (
       <div class="mt-6">
         {items.map((item) => (
-          <NewsCard item={item} density="compact" />
+          <NewsCard
+            item={item}
+            density="compact"
+            topics={classifyTopics(item).map((t) => TOPIC_LABELS[t])}
+          />
         ))}
       </div>
     )}
