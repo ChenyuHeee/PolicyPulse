@@ -32,9 +32,9 @@ export function loadNews(): NewsItem[] {
   }
   return raw
     .split("\n")
-    .map((line) => line.trim())
+    .map((line: string) => line.trim())
     .filter(Boolean)
-    .map((line) => {
+    .map((line: string): NewsItem | null => {
       try {
         return JSON.parse(line) as NewsItem;
       } catch {
@@ -42,7 +42,7 @@ export function loadNews(): NewsItem[] {
       }
     })
     .filter((item): item is NewsItem => Boolean(item))
-    .sort((a, b) => b.published_at.localeCompare(a.published_at));
+    .sort((a: NewsItem, b: NewsItem) => b.published_at.localeCompare(a.published_at));
 }
 
 export function getNewsPage(page: number, perPage = 30) {
@@ -595,6 +595,50 @@ export function getLatestByTopic(limitPerTopic = 10) {
     id: TopicId;
     label: string;
     items: NewsItem[];
+    latest: string;
+  }>;
+}
+
+export function getTopicsSummary() {
+  const items = loadNews();
+  const summary: Partial<
+    Record<
+      TopicId,
+      {
+        id: TopicId;
+        label: string;
+        count: number;
+        latest: string;
+      }
+    >
+  > = {};
+
+  for (const item of items) {
+    const topics = classifyTopics(item);
+    for (const topic of topics) {
+      const bucket = summary[topic];
+      if (!bucket) {
+        summary[topic] = {
+          id: topic,
+          label: TOPIC_LABELS[topic],
+          count: 1,
+          latest: item.published_at,
+        };
+        continue;
+      }
+      bucket.count += 1;
+      if (item.published_at > bucket.latest) {
+        bucket.latest = item.published_at;
+      }
+    }
+  }
+
+  return Object.values(summary)
+    .filter(Boolean)
+    .sort((a, b) => (b!.latest || "").localeCompare(a!.latest || "")) as Array<{
+    id: TopicId;
+    label: string;
+    count: number;
     latest: string;
   }>;
 }

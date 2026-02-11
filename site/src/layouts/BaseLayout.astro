@@ -34,6 +34,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
         </div>
         <nav class="flex items-center gap-6 text-sm text-ink-900/70">
           <a href={withBase("")} class="hover:text-ink-950">Latest</a>
+          <a href={withBase("topics/")} class="hover:text-ink-950">Topics</a>
           <a href={withBase("sources/")} class="hover:text-ink-950">Sources</a>
         </nav>
       </header>

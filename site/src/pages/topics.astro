@@ -1,0 +1,43 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getTopicsSummary } from "../lib/news";
+
+const topics = getTopicsSummary();
+const baseUrl = import.meta.env.BASE_URL;
+const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\/+/, "")}`;
+---
+
+<BaseLayout title="Topics" description="Browse topics">
+  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <h2 class="text-2xl font-semibold text-ink-950">Topics</h2>
+      <div class="text-sm text-ink-900/70">{topics.length} topics</div>
+    </div>
+
+    {topics.length === 0 ? (
+      <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
+        No topic data yet.
+      </div>
+    ) : (
+      <div class="mt-6 grid gap-3 md:grid-cols-2">
+        {topics.map((topic) => (
+          <a
+            href={withBase(`topic/${topic.id}/`)}
+            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-5 py-3 text-sm text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30"
+          >
+            <div class="min-w-0">
+              <div class="truncate font-medium text-ink-950">{topic.label}</div>
+              <div class="mt-1 text-xs text-ink-900/60 tabular-nums">
+                Latest {String(topic.latest || "").slice(0, 16).replace("T", " ")}
+              </div>
+            </div>
+            <span class="shrink-0 rounded-full bg-ink-900/10 px-3 py-1 text-xs text-ink-900/60">
+              {topic.count}
+            </span>
+          </a>
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>

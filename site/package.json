@@ -7,6 +7,9 @@
     "build": "astro build",
     "preview": "astro preview"
   },
+  "devDependencies": {
+    "@types/node": "^22.13.1"
+  },
   "dependencies": {
     "@astrojs/tailwind": "^5.1.0",
     "astro": "^4.15.0",

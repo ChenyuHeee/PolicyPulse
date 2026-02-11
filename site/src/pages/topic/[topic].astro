@@ -1,0 +1,137 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NewsCard from "../../components/NewsCard.astro";
+import {
+  classifyEventType,
+  classifyTopics,
+  EVENT_LABELS,
+  loadNews,
+  type TopicId,
+  TOPIC_LABELS,
+} from "../../lib/news";
+
+export function getStaticPaths() {
+  return Object.keys(TOPIC_LABELS).map((topic) => ({ params: { topic } }));
+}
+
+const topicId = String(Astro.params.topic || "");
+const isKnownTopic = Object.prototype.hasOwnProperty.call(TOPIC_LABELS, topicId);
+const typedTopicId = topicId as TopicId;
+const topicLabel = (TOPIC_LABELS as Record<string, string>)[topicId] || topicId;
+
+const itemsAll = loadNews();
+const items = isKnownTopic
+  ? itemsAll.filter((item) => classifyTopics(item).includes(typedTopicId))
+  : [];
+const latest = items[0]?.published_at;
+
+const eventMix: Record<string, number> = {};
+for (const key of Object.keys(EVENT_LABELS)) {
+  eventMix[key] = 0;
+}
+for (const item of items) {
+  const kind = classifyEventType(item);
+  eventMix[kind] = (eventMix[kind] ?? 0) + 1;
+}
+
+const sourceCounts: Record<string, { id: string; name: string; count: number; latest: string }> = {};
+for (const item of items) {
+  const id = item.source_id;
+  const name = item.source_name || id;
+  const bucket = sourceCounts[id];
+  if (!bucket) {
+    sourceCounts[id] = { id, name, count: 1, latest: item.published_at };
+    continue;
+  }
+  bucket.count += 1;
+  if (item.published_at > bucket.latest) {
+    bucket.latest = item.published_at;
+  }
+}
+
+const topSources = Object.values(sourceCounts)
+  .sort((a, b) => b.count - a.count || b.latest.localeCompare(a.latest))
+  .slice(0, 10);
+
+const visibleItems = items.slice(0, 80);
+
+const baseUrl = import.meta.env.BASE_URL;
+const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\/+/, "")}`;
+---
+
+<BaseLayout title={topicLabel} description={`Updates for ${topicLabel}`}>
+  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="min-w-0">
+        <h2 class="truncate text-2xl font-semibold text-ink-950">{topicLabel}</h2>
+        <p class="mt-1 text-sm text-ink-900/60">
+          {items.length} items
+          {latest && (
+            <span class="ml-2 text-ink-900/50 tabular-nums">· Latest {String(latest).slice(0, 16).replace("T", " ")}</span>
+          )}
+        </p>
+      </div>
+      <div class="flex items-center gap-4 text-xs text-ink-900/60">
+        <a href={withBase("topics/")} class="hover:text-ink-950">All topics</a>
+      </div>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-12">
+      <div class="lg:col-span-8">
+        {items.length === 0 ? (
+          <div class="mt-6 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
+            No data yet for this topic.
+          </div>
+        ) : (
+          <>
+            <div class="text-xs text-ink-900/60">
+              Showing latest {visibleItems.length} of {items.length}
+            </div>
+            <div class="mt-3">
+              {visibleItems.map((item) => (
+                <NewsCard item={item} density="compact" eventTypeLabel={EVENT_LABELS[classifyEventType(item)]} topics={[]} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+
+      <aside class="lg:col-span-4 space-y-6">
+        <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
+          <div class="text-sm font-medium text-ink-950">Event mix</div>
+          <div class="mt-3 flex flex-wrap gap-2 text-[11px] text-ink-900/60">
+            {Object.entries(EVENT_LABELS)
+              .filter(([key]) => (eventMix[key] ?? 0) > 0)
+              .map(([key, label]) => (
+                <span class="rounded bg-ink-900/10 px-2 py-1">
+                  {label} {eventMix[key]}
+                </span>
+              ))}
+          </div>
+        </div>
+
+        {topSources.length > 0 && (
+          <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
+            <div class="flex items-end justify-between gap-3">
+              <div class="text-sm font-medium text-ink-950">Top sources</div>
+              <a href={withBase("sources/")} class="text-xs text-ink-900/60 hover:text-ink-950">Sources</a>
+            </div>
+            <ul class="mt-3 divide-y divide-ink-900/10">
+              {topSources.map((s) => (
+                <li class="py-2">
+                  <div class="flex items-baseline justify-between gap-3">
+                    <a href={withBase(`source/${s.id}/`)} class="min-w-0 flex-1 truncate text-sm text-ink-950 hover:text-accent-600">
+                      {s.name}
+                    </a>
+                    <span class="shrink-0 text-[11px] text-ink-900/60 tabular-nums">{s.count}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
