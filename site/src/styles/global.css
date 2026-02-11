@@ -44,3 +44,9 @@ body {
   -webkit-line-clamp: 2;
   overflow: hidden;
 }
+
+.news-title {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  hyphens: auto;
+}
