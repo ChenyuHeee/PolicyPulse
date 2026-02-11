@@ -108,7 +108,9 @@ export type TopicId =
   | "fiscal"
   | "stability_risk"
   | "real_estate_credit"
-  | "trade_industry";
+  | "trade_industry"
+  | "capital_markets"
+  | "banking_insurance";
 
 export const TOPIC_LABELS: Record<TopicId, string> = {
   rates_liquidity: "利率/流动性",
@@ -119,6 +121,8 @@ export const TOPIC_LABELS: Record<TopicId, string> = {
   stability_risk: "金融稳定/风险",
   real_estate_credit: "地产/信用",
   trade_industry: "贸易/产业",
+  capital_markets: "资本市场",
+  banking_insurance: "银行/保险",
 };
 
 export type EventTypeId =
@@ -160,6 +164,17 @@ export function classifyTopics(item: NewsItem): TopicId[] {
   }
   if (sourceId === "nbs") {
     topics.add("macro_data");
+  }
+  if (sourceId === "mof_state_council" || sourceId === "mof") {
+    topics.add("fiscal");
+  }
+  if (sourceId === "csrc") {
+    topics.add("capital_markets");
+    topics.add("regulation");
+  }
+  if (sourceId === "nfra") {
+    topics.add("banking_insurance");
+    topics.add("regulation");
   }
 
   if (
@@ -235,6 +250,73 @@ export function classifyTopics(item: NewsItem): TopicId[] {
     ])
   ) {
     topics.add("macro_data");
+  }
+
+  if (
+    includesAny(text, [
+      "bond",
+      "bonds",
+      "stock",
+      "equity",
+      "ipo",
+      "listing",
+      "delisting",
+      "futures",
+      "derivative",
+      "fund",
+      "etf",
+      "asset management",
+      "securities",
+      "capital market",
+      "债券",
+      "国债",
+      "地方债",
+      "股票",
+      "上市",
+      "退市",
+      "ipo",
+      "再融资",
+      "并购",
+      "重组",
+      "期货",
+      "衍生品",
+      "基金",
+      "etf",
+      "资管",
+      "证券",
+      "资本市场",
+    ])
+  ) {
+    topics.add("capital_markets");
+  }
+
+  if (
+    includesAny(text, [
+      "bank",
+      "banking",
+      "insurance",
+      "insurer",
+      "capital adequacy",
+      "basel",
+      "npl",
+      "provision",
+      "deposit",
+      "loan",
+      "credit",
+      "金融机构",
+      "银行",
+      "保险",
+      "偿付能力",
+      "资本充足",
+      "不良",
+      "拨备",
+      "存款",
+      "贷款",
+      "信贷",
+      "授信",
+    ])
+  ) {
+    topics.add("banking_insurance");
   }
 
   if (

@@ -16,8 +16,7 @@ const sourceName = items[0]?.source_name || sourceId;
 <BaseLayout title={sourceName} description={`Updates from ${sourceName}`}>
   <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
     <div>
-      <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
-      <h2 class="mt-2 text-3xl font-semibold text-ink-950">{sourceName}</h2>
+      <h2 class="text-2xl font-semibold text-ink-950">{sourceName}</h2>
       <p class="mt-2 text-sm text-ink-900/60">{items.length} items</p>
     </div>
     {items.length === 0 ? (

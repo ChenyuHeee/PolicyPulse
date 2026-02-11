@@ -11,8 +11,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
 <BaseLayout title="Sources" description="Browse official sources">
   <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
     <div>
-      <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
-      <h2 class="mt-2 text-3xl font-semibold text-ink-950">Sources</h2>
+      <h2 class="text-2xl font-semibold text-ink-950">Sources</h2>
     </div>
     {sources.length === 0 ? (
       <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
