@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+  font-family: "IBM Plex Sans", "Noto Sans SC", sans-serif;
+}
+
+.hero-grid {
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(31, 142, 241, 0.15), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(212, 175, 55, 0.2), transparent 40%),
+    linear-gradient(180deg, #f6f8fb, #eef2f8 60%, #ffffff 100%);
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 28, 63, 0.08);
+  backdrop-filter: blur(12px);
+}

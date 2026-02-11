@@ -1,0 +1,171 @@
+settings:
+  user_agent: "PolicyPulseBot/0.1 (+https://github.com/your-org/PolicyPulse)"
+  request_timeout_sec: 20
+  max_retries: 3
+  retry_backoff_sec: 2
+  crawl_delay_sec: 1.0
+  alerting:
+    enabled: true
+    failure_streak_threshold: 3
+    zero_new_streak_threshold: 3
+  retention:
+    enabled: false
+    days: 365
+    max_items: 50000
+
+sources:
+  pboc:
+    enabled: true
+    notes: "Official news list: https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html"
+    config:
+      list_urls:
+        - "https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html"
+      base_url: "https://www.pbc.gov.cn/"
+      item_selector: "table tr td"
+      title_selector: "a[istitle='true']"
+      url_selector: "a[istitle='true']"
+      published_selector: "span.hui12"
+      published_format: "%Y-%m-%d"
+      published_timezone: "Asia/Shanghai"
+      content_type: "news"
+      language: "zh-CN"
+      region: "CN"
+  nbs:
+    enabled: true
+    notes: "Official data release list: https://www.stats.gov.cn/sj/zxfb/"
+    config:
+      list_urls:
+        - "https://www.stats.gov.cn/sj/zxfb/"
+      base_url: "https://www.stats.gov.cn/sj/zxfb/"
+      item_selector: "div.list-content ul li"
+      title_selector: "a.fl"
+      url_selector: "a.fl"
+      published_selector: "span"
+      published_format: "%Y-%m-%d"
+      published_timezone: "Asia/Shanghai"
+      content_type: "data"
+      language: "zh-CN"
+      region: "CN"
+  safe:
+    enabled: true
+    notes: "Official SAFE news list: https://www.safe.gov.cn/safe/whxw/index.html"
+    config:
+      list_urls:
+        - "https://www.safe.gov.cn/safe/whxw/index.html"
+      base_url: "https://www.safe.gov.cn/"
+      item_selector: "li"
+      title_selector: "dt a"
+      url_selector: "dt a"
+      published_selector: "dd"
+      published_format: "%Y-%m-%d"
+      published_timezone: "Asia/Shanghai"
+      content_type: "news"
+      language: "zh-CN"
+      region: "CN"
+  csrc:
+    enabled: false
+    config: {}
+  nfra:
+    enabled: false
+    config: {}
+  mof_state_council:
+    enabled: false
+    config: {}
+  sse:
+    enabled: false
+    config: {}
+  szse:
+    enabled: false
+    config: {}
+  bse:
+    enabled: false
+    config: {}
+  cninfo:
+    enabled: false
+    config: {}
+  fred:
+    enabled: false
+    config:
+      endpoint: ""
+      params: {}
+      auth_env:
+        api_key: "FRED_API_KEY"
+      items_path: ""
+      field_map: {}
+  federal_reserve:
+    enabled: true
+    notes: "Official RSS feed list: https://www.federalreserve.gov/feeds/default.htm"
+    config:
+      feed_urls:
+        - "https://www.federalreserve.gov/feeds/press_all.xml"
+      content_type: "news"
+      language: "en"
+      region: "US"
+  bls:
+    enabled: false
+    config:
+      endpoint: ""
+      params: {}
+      auth_env:
+        registrationKey: "BLS_API_KEY"
+      items_path: ""
+      field_map: {}
+  bea:
+    enabled: false
+    config:
+      endpoint: ""
+      params: {}
+      auth_env:
+        UserID: "BEA_API_KEY"
+      items_path: ""
+      field_map: {}
+  treasury:
+    enabled: false
+    config:
+      endpoint: ""
+      params: {}
+      items_path: ""
+      field_map: {}
+  sec_edgar:
+    enabled: false
+    config:
+      endpoint: ""
+      params: {}
+      items_path: ""
+      field_map: {}
+  ecb:
+    enabled: true
+    notes: "Official RSS feed: https://www.ecb.europa.eu/rss/press.html"
+    config:
+      feed_urls:
+        - "https://www.ecb.europa.eu/rss/press.html"
+      content_type: "news"
+      language: "en"
+      region: "EU"
+  boe:
+    enabled: true
+    notes: "Official BoE RSS feed list: https://www.bankofengland.co.uk/rss"
+    config:
+      feed_urls:
+        - "https://www.bankofengland.co.uk/rss/news"
+      content_type: "news"
+      language: "en"
+      region: "UK"
+  bis:
+    enabled: false
+    config: {}
+  imf_worldbank_oecd:
+    enabled: false
+    config: {}
+  eia:
+    enabled: false
+    config:
+      endpoint: ""
+      params: {}
+      auth_env:
+        api_key: "EIA_API_KEY"
+      items_path: ""
+      field_map: {}
+  iea:
+    enabled: false
+    config: {}

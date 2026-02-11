@@ -1,0 +1,155 @@
+name: Daily crawl and deploy
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  crawl_build_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install .
+
+      - name: Capture previous data count
+        run: |
+          if [[ -f data/news.jsonl ]]; then
+            echo "PREV_COUNT=$(wc -l < data/news.jsonl | tr -d ' ')" >> $GITHUB_ENV
+          else
+            echo "PREV_COUNT=0" >> $GITHUB_ENV
+          fi
+
+      - name: Run crawler
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+          BLS_API_KEY: ${{ secrets.BLS_API_KEY }}
+          BEA_API_KEY: ${{ secrets.BEA_API_KEY }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: |
+          python -m crawler crawl
+          python -m crawler validate
+
+      - name: Crawl summary
+        run: |
+          if [[ -f data/news.jsonl ]]; then
+            TOTAL_COUNT=$(wc -l < data/news.jsonl | tr -d ' ')
+          else
+            TOTAL_COUNT=0
+          fi
+          NEW_COUNT=$((TOTAL_COUNT - PREV_COUNT))
+          echo "Crawl summary: new=${NEW_COUNT} total=${TOTAL_COUNT}"
+          {
+            echo "Crawl summary: new=${NEW_COUNT} total=${TOTAL_COUNT}"
+            python - <<'PY'
+import json
+from pathlib import Path
+
+index_path = Path("data/index.json")
+if not index_path.exists():
+    print("\nNo index.json available for per-source stats.")
+    raise SystemExit(0)
+
+payload = json.loads(index_path.read_text(encoding="utf-8"))
+stats = payload.get("last_run", {}).get("sources", {})
+if not stats:
+    print("\nNo per-source stats recorded.")
+else:
+    print("\nPer-source stats:")
+        print("| Source | Fetched | New | Skipped | Status | Failure Streak | Zero New Streak | Last Run |")
+        print("| --- | ---: | ---: | ---: | --- | ---: | ---: | --- |")
+        for source_id in sorted(stats.keys()):
+          info = stats[source_id]
+        print(
+            "| {source} | {fetched} | {new} | {skipped} | {status} | {failure} | {zero_new} | {last_run} |".format(
+              source=source_id,
+              fetched=info.get("fetched", 0),
+              new=info.get("new", 0),
+              skipped=info.get("skipped", 0),
+              status=info.get("status", ""),
+              failure=info.get("failure_streak", 0),
+              zero_new=info.get("zero_new_streak", 0),
+              last_run=info.get("last_run", ""),
+            )
+        )
+
+alerts = payload.get("alerts", [])
+if alerts:
+    print("\nAlerts:")
+    for alert in alerts:
+          print(
+            "- {source}: {alert_type} (streak={streak}) {message} last_run={last_run} last_error={last_error}".format(
+              source=alert.get("source_id"),
+              alert_type=alert.get("type"),
+              streak=alert.get("streak"),
+              message=alert.get("message", ""),
+              last_run=alert.get("last_run", ""),
+              last_error=alert.get("last_error", ""),
+            )
+          )
+PY
+          } >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit data if changed
+        run: |
+          if [[ -n "$(git status --porcelain data)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data
+            git commit -m "chore(data): update news"
+            git push
+          else
+            echo "No data changes to commit."
+          fi
+
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install Node dependencies
+        working-directory: site
+        run: npm ci
+
+      - name: Build site
+        working-directory: site
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

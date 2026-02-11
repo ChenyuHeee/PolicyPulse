@@ -1,0 +1,54 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { getSourcesSummary, getSourceStatusMap } from "../lib/news";
+
+const sources = getSourcesSummary();
+const statusMap = getSourceStatusMap();
+const baseUrl = import.meta.env.BASE_URL;
+const withBase = (path) => `${baseUrl}${path}`;
+---
+<BaseLayout title="Sources" description="Browse official sources">
+  <section class="glass-panel rounded-3xl px-6 py-8 shadow-soft">
+    <div>
+      <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
+      <h2 class="mt-2 text-3xl font-semibold text-ink-950">Sources</h2>
+    </div>
+    {sources.length === 0 ? (
+      <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
+        No source data yet.
+      </div>
+    ) : (
+      <div class="mt-8 grid gap-4 md:grid-cols-2">
+        {sources.map((source) => {
+          const status = statusMap[source.id];
+          const statusParts = [];
+          if (status?.status) {
+            statusParts.push(`Status: ${status.status}`);
+          }
+          if (status?.last_run) {
+            statusParts.push(`Last run ${status.last_run}`);
+          }
+          const statusLine = statusParts.join(" · ");
+          return (
+          <a
+            href={withBase(`source/${source.id}`)}
+            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-5 py-4 text-sm text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30"
+          >
+            <div>
+              <div class="font-medium">{source.name}</div>
+              {statusLine && (
+                <div class="mt-2 text-xs text-ink-900/60">
+                  {statusLine}
+                </div>
+              )}
+            </div>
+            <span class="rounded-full bg-ink-900/10 px-3 py-1 text-xs text-ink-900/60">
+              {source.count}
+            </span>
+          </a>
+          );
+        })}
+      </div>
+    )}
+  </section>
+</BaseLayout>

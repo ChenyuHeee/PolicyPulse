@@ -1,0 +1,35 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import NewsCard from "../../components/NewsCard.astro";
+import { loadNews } from "../../lib/news";
+
+export function getStaticPaths() {
+  const items = loadNews();
+  const ids = new Set(items.map((item) => item.source_id));
+  return Array.from(ids).map((id) => ({ params: { source: id } }));
+}
+
+const sourceId = Astro.params.source || "";
+const items = loadNews().filter((item) => item.source_id === sourceId);
+const sourceName = items[0]?.source_name || sourceId;
+---
+<BaseLayout title={sourceName} description={`Updates from ${sourceName}`}>
+  <section class="glass-panel rounded-3xl px-6 py-8 shadow-soft">
+    <div>
+      <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
+      <h2 class="mt-2 text-3xl font-semibold text-ink-950">{sourceName}</h2>
+      <p class="mt-2 text-sm text-ink-900/60">{items.length} items</p>
+    </div>
+    {items.length === 0 ? (
+      <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
+        No data yet for this source.
+      </div>
+    ) : (
+      <div class="mt-8 grid gap-6 md:grid-cols-2">
+        {items.map((item) => (
+          <NewsCard item={item} />
+        ))}
+      </div>
+    )}
+  </section>
+</BaseLayout>

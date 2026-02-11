@@ -1,0 +1,31 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import NewsCard from "../components/NewsCard.astro";
+import Pagination from "../components/Pagination.astro";
+import { getNewsPage } from "../lib/news";
+
+const { items, totalPages, currentPage, totalItems } = getNewsPage(1);
+---
+<BaseLayout title="Latest" description="Latest official policy and macro updates">
+  <section class="glass-panel rounded-3xl px-6 py-8 shadow-soft">
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <div>
+        <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
+        <h2 class="mt-2 text-3xl font-semibold text-ink-950">Latest Stream</h2>
+      </div>
+      <div class="text-sm text-ink-900/70">Total {totalItems} items</div>
+    </div>
+    {items.length === 0 ? (
+      <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
+        No data yet. Enable sources in crawler/sources_config.yaml and run the crawler.
+      </div>
+    ) : (
+      <div class="mt-8 grid gap-6 md:grid-cols-2">
+        {items.map((item) => (
+          <NewsCard item={item} />
+        ))}
+      </div>
+    )}
+    {totalPages > 1 && <Pagination current={currentPage} total={totalPages} />}
+  </section>
+</BaseLayout>

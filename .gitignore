@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.env
+._*
+.AppleDouble
+.DS_Store
+._*
+
+site/node_modules/
+site/dist/
+site/.astro/
+
+coverage/
+.pytest_cache/

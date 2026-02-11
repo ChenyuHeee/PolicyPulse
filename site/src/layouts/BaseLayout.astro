@@ -1,0 +1,52 @@
+---
+import "../styles/global.css";
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} | PolicyPulse` : "PolicyPulse";
+const pageDescription =
+  description || "Official-source financial policy and macro data pulse.";
+const baseUrl = import.meta.env.BASE_URL;
+const withBase = (path) => `${baseUrl}${path}`;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={pageDescription} />
+    <title>{pageTitle}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Serif:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen">
+    <div class="hero-grid">
+      <header class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-6">
+        <div>
+          <p class="text-xs uppercase tracking-[0.3em] text-ink-900/70">
+            From Official Sources, For Smarter Decisions
+          </p>
+          <h1 class="mt-2 text-2xl font-semibold text-ink-950">PolicyPulse</h1>
+        </div>
+        <nav class="flex items-center gap-6 text-sm text-ink-900/70">
+          <a href={withBase("")} class="hover:text-ink-950">Latest</a>
+          <a href={withBase("sources")} class="hover:text-ink-950">Sources</a>
+        </nav>
+      </header>
+
+      <main class="mx-auto w-full max-w-6xl px-6 pb-16">
+        <slot />
+      </main>
+
+      <footer class="mx-auto w-full max-w-6xl px-6 pb-12 text-xs text-ink-900/60">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-t border-ink-900/10 pt-6">
+          <span>PolicyPulse · 金源观潮</span>
+          <span>Updated daily via GitHub Actions</span>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

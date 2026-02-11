@@ -1,0 +1,41 @@
+---
+const { item } = Astro.props;
+const published = new Date(item.published_at).toLocaleString("zh-CN", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+const metaParts = [];
+if (item.source_name) {
+  metaParts.push(`Source: ${item.source_name}`);
+}
+if (item.content_type) {
+  metaParts.push(item.content_type);
+}
+const regionLanguage = [item.region, item.language].filter(Boolean).join("/");
+if (regionLanguage) {
+  metaParts.push(regionLanguage);
+}
+const metaLine = metaParts.join(" · ");
+---
+<article class="glass-panel rounded-2xl p-5 shadow-soft transition hover:-translate-y-1 hover:shadow-lg">
+  <div class="flex flex-wrap items-center gap-3 text-xs text-ink-900/60">
+    <span class="rounded-full bg-ink-900/10 px-3 py-1 text-[11px] uppercase tracking-[0.2em]">
+      {item.source_name}
+    </span>
+    <span>{published}</span>
+  </div>
+  <h3 class="mt-3 text-lg font-semibold text-ink-950">
+    <a href={item.url} target="_blank" rel="noopener noreferrer" class="hover:text-accent-600">
+      {item.title}
+    </a>
+  </h3>
+  {metaLine && (
+    <p class="mt-2 text-xs text-ink-900/60">{metaLine}</p>
+  )}
+  {item.summary && (
+    <p class="mt-3 text-sm text-ink-900/70">{item.summary}</p>
+  )}
+</article>
