@@ -4,6 +4,7 @@ import NewsCard from "../components/NewsCard.astro";
 import Pagination from "../components/Pagination.astro";
 import {
   classifyTopics,
+  loadNews,
   classifyEventType,
   EVENT_LABELS,
   getLatestBySource,
@@ -13,14 +14,26 @@ import {
 } from "../lib/news";
 
 const { items, totalPages, currentPage, totalItems } = getNewsPage(1);
-const bySource = getLatestBySource(6);
-const byTopic = getLatestByTopic(10);
+const allItems = loadNews();
+const todayKey = new Date().toISOString().slice(0, 10);
+const todayItems = allItems.filter((item) => String(item.published_at || "").slice(0, 10) === todayKey);
+const todayCounts: Record<string, number> = {};
+for (const key of Object.keys(EVENT_LABELS)) {
+  todayCounts[key] = 0;
+}
+for (const item of todayItems) {
+  const kind = classifyEventType(item);
+  todayCounts[kind] = (todayCounts[kind] ?? 0) + 1;
+}
+
+const activeSources = getLatestBySource(1).slice(0, 10);
+const activeTopics = getLatestByTopic(1).slice(0, 8);
 const baseUrl = import.meta.env.BASE_URL;
 const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\/+/, "")}`;
 ---
 <BaseLayout title="Latest" description="Latest official policy and macro updates">
-  <section class="glass-panel rounded-3xl px-6 py-8 shadow-soft">
+  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
@@ -29,100 +42,116 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
       <div class="text-sm text-ink-900/70">Total {totalItems} items</div>
     </div>
 
-    {bySource.length > 0 && (
-      <div class="mt-6 rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
-        <div class="flex flex-wrap items-end justify-between gap-3">
-          <div class="text-sm font-medium text-ink-950">By source</div>
-          <a href={withBase("sources/")} class="text-xs text-ink-900/60 hover:text-ink-950">
-            View all sources
-          </a>
+    <div class="mt-4 rounded-2xl border border-ink-900/10 bg-white/60 px-4 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-ink-900/70">
+          <span class="font-medium text-ink-950">Today</span>
+          <span>{todayItems.length} new</span>
+          <span class="hidden sm:inline">Build-day snapshot</span>
         </div>
-        <div class="mt-4 grid gap-4 md:grid-cols-2">
-          {bySource.map((group) => (
-            <div class="rounded-2xl border border-ink-900/10 bg-white/70 px-4 py-3">
-              <div class="flex items-center justify-between gap-3">
-                <a
-                  href={withBase(`source/${group.id}/`)}
-                  class="text-sm font-medium text-ink-950 hover:text-accent-600"
-                >
-                  {group.name}
-                </a>
-                <span class="text-xs text-ink-900/60">Latest {group.items.length}</span>
-              </div>
-              <ul class="mt-3 space-y-2">
-                {group.items.map((item) => (
-                  <li class="text-xs text-ink-900/70">
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="hover:text-accent-600"
-                    >
-                      <span class="mr-2 rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] text-ink-900/70">
-                        {EVENT_LABELS[classifyEventType(item)]}
-                      </span>
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div class="flex flex-wrap items-center gap-2 text-[11px] text-ink-900/60">
+          {Object.entries(EVENT_LABELS)
+            .filter(([key]) => (todayCounts[key] ?? 0) > 0)
+            .map(([key, label]) => (
+              <span class="rounded bg-ink-900/10 px-2 py-1">
+                {label} {todayCounts[key]}
+              </span>
+            ))}
         </div>
       </div>
-    )}
+    </div>
+    <div class="mt-6 grid gap-6 lg:grid-cols-12">
+      <div class="lg:col-span-8">
+        {totalPages > 1 && <Pagination current={currentPage} total={totalPages} />}
+        {items.length === 0 ? (
+          <div class="mt-6 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
+            No data yet. Enable sources in crawler/sources_config.yaml and run the crawler.
+          </div>
+        ) : (
+          <div class="mt-4">
+            {items.map((item) => (
+              <NewsCard
+                item={item}
+                density="compact"
+                topics={classifyTopics(item).map((t) => TOPIC_LABELS[t])}
+                eventTypeLabel={EVENT_LABELS[classifyEventType(item)]}
+              />
+            ))}
+          </div>
+        )}
+        {totalPages > 1 && <Pagination current={currentPage} total={totalPages} />}
+      </div>
 
-    {byTopic.length > 0 && (
-      <div class="mt-6 rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
-        <div class="flex flex-wrap items-end justify-between gap-3">
-          <div class="text-sm font-medium text-ink-950">By topic</div>
-          <div class="text-xs text-ink-900/60">Generalist view</div>
-        </div>
-        <div class="mt-4 grid gap-4 md:grid-cols-2">
-          {byTopic.map((group) => (
-            <div class="rounded-2xl border border-ink-900/10 bg-white/70 px-4 py-3">
-              <div class="flex items-center justify-between gap-3">
-                <div class="text-sm font-medium text-ink-950">{group.label}</div>
-                <span class="text-xs text-ink-900/60">Latest {group.items.length}</span>
-              </div>
-              <ul class="mt-3 space-y-2">
-                {group.items.map((item) => (
-                  <li class="text-xs text-ink-900/70">
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="hover:text-accent-600"
-                    >
-                      <span class="mr-2 rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] text-ink-900/70">
-                        {EVENT_LABELS[classifyEventType(item)]}
-                      </span>
-                      {item.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+      <aside class="lg:col-span-4 space-y-6">
+        {activeSources.length > 0 && (
+          <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
+            <div class="flex items-end justify-between gap-3">
+              <div class="text-sm font-medium text-ink-950">Active sources</div>
+              <a href={withBase("sources/")} class="text-xs text-ink-900/60 hover:text-ink-950">
+                All
+              </a>
             </div>
-          ))}
-        </div>
-      </div>
-    )}
-    {items.length === 0 ? (
-      <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
-        No data yet. Enable sources in crawler/sources_config.yaml and run the crawler.
-      </div>
-    ) : (
-      <div class="mt-6">
-        {items.map((item) => (
-          <NewsCard
-            item={item}
-            density="compact"
-            topics={classifyTopics(item).map((t) => TOPIC_LABELS[t])}
-            eventTypeLabel={EVENT_LABELS[classifyEventType(item)]}
-          />
-        ))}
-      </div>
-    )}
-    {totalPages > 1 && <Pagination current={currentPage} total={totalPages} />}
+            <ul class="mt-3 divide-y divide-ink-900/10">
+              {activeSources.map((group) => {
+                const item = group.items[0];
+                const kind = item ? EVENT_LABELS[classifyEventType(item)] : "";
+                const ts = item?.published_at ? String(item.published_at).slice(5, 16).replace("T", " ") : "";
+                return (
+                  <li class="py-2">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <a
+                        href={withBase(`source/${group.id}/`)}
+                        class="min-w-0 flex-1 truncate text-sm text-ink-950 hover:text-accent-600"
+                      >
+                        {group.name}
+                      </a>
+                      <span class="shrink-0 text-[11px] text-ink-900/60 tabular-nums">{ts}</span>
+                    </div>
+                    {kind && (
+                      <div class="mt-1 text-[11px] text-ink-900/60">
+                        <span class="rounded bg-ink-900/10 px-1.5 py-0.5">{kind}</span>
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        {activeTopics.length > 0 && (
+          <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
+            <div class="flex items-end justify-between gap-3">
+              <div class="text-sm font-medium text-ink-950">Topics pulse</div>
+              <div class="text-xs text-ink-900/60">Generalist</div>
+            </div>
+            <ul class="mt-3 divide-y divide-ink-900/10">
+              {activeTopics.map((group) => {
+                const item = group.items[0];
+                const ts = item?.published_at ? String(item.published_at).slice(5, 16).replace("T", " ") : "";
+                return (
+                  <li class="py-2">
+                    <div class="flex items-baseline justify-between gap-3">
+                      <div class="min-w-0 flex-1 truncate text-sm text-ink-950">{group.label}</div>
+                      <span class="shrink-0 text-[11px] text-ink-900/60 tabular-nums">{ts}</span>
+                    </div>
+                    {item?.title && (
+                      <a
+                        href={item.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="mt-1 block text-[11px] text-ink-900/60 hover:text-accent-600 line-clamp-1"
+                      >
+                        {item.title}
+                      </a>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+      </aside>
+    </div>
   </section>
 </BaseLayout>

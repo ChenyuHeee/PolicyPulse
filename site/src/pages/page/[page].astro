@@ -16,20 +16,23 @@ const page = Number(Astro.params.page || "1");
 const { items, totalPages, currentPage, totalItems } = getNewsPage(page);
 ---
 <BaseLayout title={`Page ${currentPage}`} description="Latest official policy and macro updates">
-  <section class="glass-panel rounded-3xl px-6 py-8 shadow-soft">
+  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
         <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
         <h2 class="mt-2 text-3xl font-semibold text-ink-950">Latest Stream</h2>
       </div>
-      <div class="text-sm text-ink-900/70">Total {totalItems} items</div>
+      <div class="text-sm text-ink-900/70">
+        Page {currentPage}/{totalPages} · {totalItems} items
+      </div>
     </div>
+    {totalPages > 1 && <Pagination current={currentPage} total={totalPages} />}
     {items.length === 0 ? (
       <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
         No data yet. Enable sources in crawler/sources_config.yaml and run the crawler.
       </div>
     ) : (
-      <div class="mt-6">
+      <div class="mt-4">
         {items.map((item) => (
           <NewsCard
             item={item}

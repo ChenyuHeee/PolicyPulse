@@ -14,7 +14,7 @@ const items = loadNews().filter((item) => item.source_id === sourceId);
 const sourceName = items[0]?.source_name || sourceId;
 ---
 <BaseLayout title={sourceName} description={`Updates from ${sourceName}`}>
-  <section class="glass-panel rounded-3xl px-6 py-8 shadow-soft">
+  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
     <div>
       <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
       <h2 class="mt-2 text-3xl font-semibold text-ink-950">{sourceName}</h2>
@@ -25,7 +25,7 @@ const sourceName = items[0]?.source_name || sourceId;
         No data yet for this source.
       </div>
     ) : (
-      <div class="mt-6">
+      <div class="mt-4">
         {items.map((item) => (
           <NewsCard
             item={item}

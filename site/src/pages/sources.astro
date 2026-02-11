@@ -9,7 +9,7 @@ const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\/+/, "")}`;
 ---
 <BaseLayout title="Sources" description="Browse official sources">
-  <section class="glass-panel rounded-3xl px-6 py-8 shadow-soft">
+  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
     <div>
       <p class="text-xs uppercase tracking-[0.35em] text-ink-900/60">PolicyPulse</p>
       <h2 class="mt-2 text-3xl font-semibold text-ink-950">Sources</h2>
@@ -19,7 +19,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
         No source data yet.
       </div>
     ) : (
-      <div class="mt-8 grid gap-4 md:grid-cols-2">
+      <div class="mt-6 grid gap-3 md:grid-cols-2">
         {sources.map((source) => {
           const status = statusMap[source.id];
           const statusParts = [];
@@ -33,7 +33,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
           return (
           <a
             href={withBase(`source/${source.id}/`)}
-            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-5 py-4 text-sm text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30"
+            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-5 py-3 text-sm text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30"
           >
             <div>
               <div class="font-medium">{source.name}</div>

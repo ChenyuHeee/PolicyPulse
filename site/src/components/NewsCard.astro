@@ -21,22 +21,35 @@ if (regionLanguage) {
 const metaLine = metaParts.join(" · ");
 ---
 {density === "compact" ? (
-  <article class="border-b border-ink-900/10 py-3">
-    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px] text-ink-900/60">
-      <span class="rounded-full bg-ink-900/10 px-2.5 py-1 uppercase tracking-[0.18em]">
-        {item.source_name}
-      </span>
-      <span>{published}</span>
-      {eventTypeLabel && <span class="rounded-full bg-ink-900/10 px-2.5 py-1">{eventTypeLabel}</span>}
-      {topics.length > 0 && <span class="hidden md:inline">{topics.join(" · ")}</span>}
-      {metaLine && <span class="hidden sm:inline">{metaLine}</span>}
-    </div>
-    <h3 class="mt-2 text-sm font-medium text-ink-950">
-      <a href={item.url} target="_blank" rel="noopener noreferrer" class="hover:text-accent-600">
+  <article class="border-b border-ink-900/10 py-2">
+    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+      <span class="text-[11px] text-ink-900/60 tabular-nums">{published}</span>
+      {item.source_name && (
+        <span class="rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.18em] text-ink-900/70">
+          {item.source_name}
+        </span>
+      )}
+      {eventTypeLabel && (
+        <span class="rounded bg-ink-900/10 px-1.5 py-0.5 text-[10px] text-ink-900/70">
+          {eventTypeLabel}
+        </span>
+      )}
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="min-w-0 flex-1 text-sm font-medium text-ink-950 hover:text-accent-600 md:line-clamp-1"
+      >
         {item.title}
       </a>
-    </h3>
-    {item.summary && <p class="mt-1 text-xs text-ink-900/70 line-clamp-2">{item.summary}</p>}
+    </div>
+    {(topics.length > 0 || metaLine || item.summary) && (
+      <div class="mt-1 hidden lg:flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-ink-900/60">
+        {topics.length > 0 && <span>{topics.join(" · ")}</span>}
+        {metaLine && <span>{metaLine}</span>}
+        {item.summary && <span class="hidden xl:inline line-clamp-1">{item.summary}</span>}
+      </div>
+    )}
   </article>
 ) : (
   <article class="glass-panel rounded-2xl p-5 shadow-soft transition hover:-translate-y-1 hover:shadow-lg">
