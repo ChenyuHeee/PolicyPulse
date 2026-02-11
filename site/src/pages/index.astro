@@ -33,12 +33,12 @@ const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\/+/, "")}`;
 ---
 <BaseLayout title="Latest" description="Latest official policy and macro updates">
-  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
+  <section class="glass-panel rounded-3xl px-4 py-4 shadow-soft sm:px-6 sm:py-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-semibold text-ink-950">Latest</h2>
+        <h2 class="text-xl font-semibold text-ink-950 sm:text-2xl">Latest</h2>
       </div>
-      <div class="text-sm text-ink-900/70">Total {totalItems} items</div>
+      <div class="text-xs text-ink-900/70 sm:text-sm">Total {totalItems} items</div>
     </div>
 
     <div class="mt-4 rounded-2xl border border-ink-900/10 bg-white/60 px-4 py-3">
@@ -59,7 +59,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
         </div>
       </div>
     </div>
-    <div class="mt-6 grid gap-6 lg:grid-cols-12">
+    <div class="mt-5 grid gap-4 sm:mt-6 sm:gap-6 lg:grid-cols-12">
       <div class="lg:col-span-8">
         {totalPages > 1 && <Pagination current={currentPage} total={totalPages} />}
         {items.length === 0 ? (
@@ -81,16 +81,16 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
         {totalPages > 1 && <Pagination current={currentPage} total={totalPages} />}
       </div>
 
-      <aside class="lg:col-span-4 space-y-6">
+      <aside class="lg:col-span-4 space-y-4 sm:space-y-6">
         {activeTopics.length > 0 && (
-          <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
+          <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-4 py-3 sm:px-5 sm:py-4">
             <div class="flex items-end justify-between gap-3">
               <div class="text-sm font-medium text-ink-950">Topics pulse</div>
               <a href={withBase("topics/")} class="text-xs text-ink-900/60 hover:text-ink-950">
                 All
               </a>
             </div>
-            <ul class="mt-3 divide-y divide-ink-900/10">
+            <ul class="mt-2.5 divide-y divide-ink-900/10 sm:mt-3">
               {activeTopics.map((group) => {
                 const item = group.items[0];
                 const ts = item?.published_at ? String(item.published_at).slice(5, 16).replace("T", " ") : "";
@@ -123,14 +123,14 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
         )}
 
         {activeSources.length > 0 && (
-          <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-5 py-4">
+          <div class="rounded-2xl border border-ink-900/10 bg-white/60 px-4 py-3 sm:px-5 sm:py-4">
             <div class="flex items-end justify-between gap-3">
               <div class="text-sm font-medium text-ink-950">Active sources</div>
               <a href={withBase("sources/")} class="text-xs text-ink-900/60 hover:text-ink-950">
                 All
               </a>
             </div>
-            <ul class="mt-3 divide-y divide-ink-900/10">
+            <ul class="mt-2.5 divide-y divide-ink-900/10 sm:mt-3">
               {activeSources.map((group) => {
                 const item = group.items[0];
                 const kind = item ? EVENT_LABELS[classifyEventType(item)] : "";

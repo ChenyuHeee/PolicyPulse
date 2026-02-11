@@ -5,11 +5,11 @@ const baseUrl = import.meta.env.BASE_URL;
 const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\/+/, "")}`;
 ---
-<nav class="mt-10 flex flex-wrap items-center gap-2">
+<nav class="mt-6 flex items-center gap-2 overflow-x-auto whitespace-nowrap py-1 sm:mt-10">
   {current > 1 && (
     <a
       href={withBase(current === 2 ? "" : `page/${current - 1}/`)}
-      class="rounded-full border border-ink-900/10 px-4 py-2 text-sm text-ink-900/70 hover:border-ink-900/30"
+      class="rounded-full border border-ink-900/10 px-3 py-1.5 text-[13px] text-ink-900/70 hover:border-ink-900/30 sm:px-4 sm:py-2 sm:text-sm"
     >
       Prev
     </a>
@@ -17,7 +17,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
   {pages.map((page) => (
     <a
       href={withBase(page === 1 ? "" : `page/${page}/`)}
-      class={`rounded-full px-4 py-2 text-sm ${
+      class={`rounded-full px-3 py-1.5 text-[13px] sm:px-4 sm:py-2 sm:text-sm ${
         page === current
           ? "bg-ink-900 text-white"
           : "border border-ink-900/10 text-ink-900/70 hover:border-ink-900/30"
@@ -29,7 +29,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
   {current < total && (
     <a
       href={withBase(`page/${current + 1}/`)}
-      class="rounded-full border border-ink-900/10 px-4 py-2 text-sm text-ink-900/70 hover:border-ink-900/30"
+      class="rounded-full border border-ink-900/10 px-3 py-1.5 text-[13px] text-ink-900/70 hover:border-ink-900/30 sm:px-4 sm:py-2 sm:text-sm"
     >
       Next
     </a>

@@ -9,9 +9,9 @@ const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
 const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\/+/, "")}`;
 ---
 <BaseLayout title="Sources" description="Browse official sources">
-  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
+  <section class="glass-panel rounded-3xl px-4 py-4 shadow-soft sm:px-6 sm:py-6">
     <div>
-      <h2 class="text-2xl font-semibold text-ink-950">Sources</h2>
+      <h2 class="text-xl font-semibold text-ink-950 sm:text-2xl">Sources</h2>
     </div>
     {sources.length === 0 ? (
       <div class="mt-8 rounded-2xl border border-dashed border-ink-900/20 px-6 py-12 text-center text-sm text-ink-900/60">
@@ -32,17 +32,17 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
           return (
           <a
             href={withBase(`source/${source.id}/`)}
-            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-5 py-3 text-sm text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30"
+            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-4 py-3 text-[13px] text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30 sm:px-5 sm:text-sm"
           >
-            <div>
-              <div class="font-medium">{source.name}</div>
+            <div class="min-w-0">
+              <div class="truncate font-medium text-ink-950">{source.name}</div>
               {statusLine && (
-                <div class="mt-2 text-xs text-ink-900/60">
+                <div class="mt-1 text-xs text-ink-900/60 line-clamp-2 sm:mt-2">
                   {statusLine}
                 </div>
               )}
             </div>
-            <span class="rounded-full bg-ink-900/10 px-3 py-1 text-xs text-ink-900/60">
+            <span class="shrink-0 rounded-full bg-ink-900/10 px-3 py-1 text-[11px] text-ink-900/60 sm:text-xs">
               {source.count}
             </span>
           </a>

@@ -16,12 +16,12 @@ const page = Number(Astro.params.page || "1");
 const { items, totalPages, currentPage, totalItems } = getNewsPage(page);
 ---
 <BaseLayout title={`Page ${currentPage}`} description="Latest official policy and macro updates">
-  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
+  <section class="glass-panel rounded-3xl px-4 py-4 shadow-soft sm:px-6 sm:py-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h2 class="text-2xl font-semibold text-ink-950">Latest</h2>
+        <h2 class="text-xl font-semibold text-ink-950 sm:text-2xl">Latest</h2>
       </div>
-      <div class="text-sm text-ink-900/70">
+      <div class="text-xs text-ink-900/70 sm:text-sm">
         Page {currentPage}/{totalPages} · {totalItems} items
       </div>
     </div>

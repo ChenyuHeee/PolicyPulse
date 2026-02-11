@@ -14,9 +14,9 @@ const items = loadNews().filter((item) => item.source_id === sourceId);
 const sourceName = items[0]?.source_name || sourceId;
 ---
 <BaseLayout title={sourceName} description={`Updates from ${sourceName}`}>
-  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
+  <section class="glass-panel rounded-3xl px-4 py-4 shadow-soft sm:px-6 sm:py-6">
     <div>
-      <h2 class="text-2xl font-semibold text-ink-950">{sourceName}</h2>
+      <h2 class="text-xl font-semibold text-ink-950 sm:text-2xl">{sourceName}</h2>
       <p class="mt-2 text-sm text-ink-900/60">{items.length} items</p>
     </div>
     {items.length === 0 ? (

@@ -25,25 +25,25 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
   </head>
   <body class="min-h-screen">
     <div class="hero-grid">
-      <header class="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-3">
+      <header class="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 sm:px-6 sm:py-3">
         <div>
           <p class="hidden text-xs uppercase tracking-[0.3em] text-ink-900/70 lg:block">
             From Official Sources, For Smarter Decisions
           </p>
-          <h1 class="text-xl font-semibold text-ink-950">PolicyPulse</h1>
+          <h1 class="text-lg font-semibold text-ink-950 sm:text-xl">PolicyPulse</h1>
         </div>
-        <nav class="flex items-center gap-6 text-sm text-ink-900/70">
+        <nav class="flex items-center gap-4 overflow-x-auto whitespace-nowrap text-[13px] text-ink-900/70 sm:gap-6 sm:text-sm">
           <a href={withBase("")} class="hover:text-ink-950">Latest</a>
           <a href={withBase("topics/")} class="hover:text-ink-950">Topics</a>
           <a href={withBase("sources/")} class="hover:text-ink-950">Sources</a>
         </nav>
       </header>
 
-      <main class="mx-auto w-full max-w-6xl px-6 pb-12">
+      <main class="mx-auto w-full max-w-6xl px-4 pb-10 sm:px-6 sm:pb-12">
         <slot />
       </main>
 
-      <footer class="mx-auto w-full max-w-6xl px-6 pb-12 text-xs text-ink-900/60">
+      <footer class="mx-auto w-full max-w-6xl px-4 pb-10 text-xs text-ink-900/60 sm:px-6 sm:pb-12">
         <div class="flex flex-wrap items-center justify-between gap-4 border-t border-ink-900/10 pt-6">
           <span>PolicyPulse · 金源观潮</span>
           <span>Updated daily via GitHub Actions</span>

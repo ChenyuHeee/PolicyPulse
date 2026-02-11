@@ -9,10 +9,10 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
 ---
 
 <BaseLayout title="Topics" description="Browse topics">
-  <section class="glass-panel rounded-3xl px-6 py-6 shadow-soft">
+  <section class="glass-panel rounded-3xl px-4 py-4 shadow-soft sm:px-6 sm:py-6">
     <div class="flex flex-wrap items-end justify-between gap-4">
-      <h2 class="text-2xl font-semibold text-ink-950">Topics</h2>
-      <div class="text-sm text-ink-900/70">{topics.length} topics</div>
+      <h2 class="text-xl font-semibold text-ink-950 sm:text-2xl">Topics</h2>
+      <div class="text-xs text-ink-900/70 sm:text-sm">{topics.length} topics</div>
     </div>
 
     {topics.length === 0 ? (
@@ -24,7 +24,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
         {topics.map((topic) => (
           <a
             href={withBase(`topic/${topic.id}/`)}
-            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-5 py-3 text-sm text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30"
+            class="flex items-center justify-between rounded-2xl border border-ink-900/10 bg-white/70 px-4 py-3 text-[13px] text-ink-900/80 shadow-soft transition hover:-translate-y-1 hover:border-ink-900/30 sm:px-5 sm:text-sm"
           >
             <div class="min-w-0">
               <div class="truncate font-medium text-ink-950">{topic.label}</div>
@@ -32,7 +32,7 @@ const withBase = (path) => `${normalizedBaseUrl}${String(path ?? "").replace(/^\
                 Latest {String(topic.latest || "").slice(0, 16).replace("T", " ")}
               </div>
             </div>
-            <span class="shrink-0 rounded-full bg-ink-900/10 px-3 py-1 text-xs text-ink-900/60">
+            <span class="shrink-0 rounded-full bg-ink-900/10 px-3 py-1 text-[11px] text-ink-900/60 sm:text-xs">
               {topic.count}
             </span>
           </a>
