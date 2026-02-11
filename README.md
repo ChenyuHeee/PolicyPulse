@@ -95,6 +95,12 @@ Source definitions live in `crawler/sources/` (one module per source). Runtime s
 
 ### Enabled sources (default)
 
+- China Securities Regulatory Commission (CSRC) news
+  - List page: https://www.csrc.gov.cn/csrc/c100028/common_list.shtml
+- National Financial Regulatory Administration (NFRA) regulatory updates (API)
+  - API: https://www.nfra.gov.cn/cbircweb/DocInfo/SelectDocByItemIdAndChild
+- Ministry of Finance (MOF) policy releases
+  - List page: https://www.mof.gov.cn/zhengwuxinxi/zhengcefabu/
 - State Administration of Foreign Exchange (SAFE) news
   - List page: https://www.safe.gov.cn/safe/whxw/index.html
 - People's Bank of China (PBoC) news
@@ -107,6 +113,10 @@ Source definitions live in `crawler/sources/` (one module per source). Runtime s
 - Federal Reserve press releases (RSS)
   - Feed: https://www.federalreserve.gov/feeds/press_all.xml
   - Source index: https://www.federalreserve.gov/feeds/default.htm
+- FRED release dates (API)
+  - API: https://api.stlouisfed.org/fred/releases/dates
+- U.S. Bureau of Labor Statistics (BLS) unemployment series (API)
+  - API: https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000
 - National Bureau of Statistics of China (NBS) data releases (HTML list)
   - List page: https://www.stats.gov.cn/sj/zxfb/
   - Rationale: official “数据发布” list with stable list entries and dates

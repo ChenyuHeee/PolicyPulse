@@ -53,7 +53,7 @@ sources:
       list_urls:
         - "https://www.safe.gov.cn/safe/whxw/index.html"
       base_url: "https://www.safe.gov.cn/"
-      item_selector: "li"
+      item_selector: "div.list_conr ul li"
       title_selector: "dt a"
       url_selector: "dt a"
       published_selector: "dd"
@@ -63,14 +63,59 @@ sources:
       language: "zh-CN"
       region: "CN"
   csrc:
-    enabled: false
-    config: {}
+    enabled: true
+    notes: "Official CSRC news list: https://www.csrc.gov.cn/csrc/c100028/common_list.shtml"
+    config:
+      list_urls:
+        - "https://www.csrc.gov.cn/csrc/c100028/common_list.shtml"
+      base_url: "https://www.csrc.gov.cn/"
+      item_selector: "div.common-list ul.list li"
+      title_selector: "a"
+      url_selector: "a"
+      published_selector: "span.date"
+      published_format: "%Y-%m-%d"
+      published_timezone: "Asia/Shanghai"
+      content_type: "news"
+      language: "zh-CN"
+      region: "CN"
   nfra:
-    enabled: false
-    config: {}
+    enabled: true
+    notes: "NFRA dynamic list via official API (监管动态)"
+    config:
+      endpoint: "https://www.nfra.gov.cn/cbircweb/DocInfo/SelectDocByItemIdAndChild"
+      params:
+        itemId: 915
+        itemPId: 914
+        pageSize: 30
+        pageIndex: 1
+      items_path: "data.rows"
+      field_map:
+        title: "docTitle"
+        url: "docFileUrl"
+        published_at: "publishDate"
+        summary: "docSummary"
+      base_url: "https://www.nfra.gov.cn/"
+      published_format: "%Y-%m-%d %H:%M:%S"
+      published_timezone: "Asia/Shanghai"
+      content_type: "news"
+      language: "zh-CN"
+      region: "CN"
   mof_state_council:
-    enabled: false
-    config: {}
+    enabled: true
+    notes: "MOF policy releases list: https://www.mof.gov.cn/zhengwuxinxi/zhengcefabu/"
+    config:
+      list_urls:
+        - "https://www.mof.gov.cn/zhengwuxinxi/zhengcefabu/"
+      base_url: "https://www.mof.gov.cn/"
+      item_selector: "ul.xwfb_listbox li"
+      title_selector: "a"
+      url_selector: "a"
+      published_selector: "span"
+      published_format: "%Y-%m-%d"
+      published_timezone: "Asia/Shanghai"
+      content_type: "policy"
+      language: "zh-CN"
+      region: "CN"
   sse:
     enabled: false
     config: {}
@@ -84,14 +129,23 @@ sources:
     enabled: false
     config: {}
   fred:
-    enabled: false
+    enabled: true
     config:
-      endpoint: ""
-      params: {}
+      endpoint: "https://api.stlouisfed.org/fred/releases/dates"
+      params:
+        file_type: "json"
+        limit: 50
+        sort_order: "desc"
       auth_env:
         api_key: "FRED_API_KEY"
-      items_path: ""
-      field_map: {}
+      items_path: "release_dates"
+      field_map:
+        title: "release_name"
+        published_at: "date"
+      url_template: "https://fred.stlouisfed.org/release?rid={release_id}"
+      content_type: "data"
+      language: "en"
+      region: "US"
   federal_reserve:
     enabled: true
     notes: "Official RSS feed list: https://www.federalreserve.gov/feeds/default.htm"
@@ -102,14 +156,22 @@ sources:
       language: "en"
       region: "US"
   bls:
-    enabled: false
+    enabled: true
     config:
-      endpoint: ""
-      params: {}
+      endpoint: "https://api.bls.gov/publicAPI/v1/timeseries/data/LNS14000000"
+      params:
+        registrationKey: ""
       auth_env:
         registrationKey: "BLS_API_KEY"
-      items_path: ""
-      field_map: {}
+      items_path: "Results.series.0.data"
+      field_map:
+        summary: "value"
+      title_template: "Unemployment rate {periodName} {year}"
+      published_at_template: "{periodName} {year}"
+      url_template: "https://www.bls.gov/charts/employment-situation/civilian-unemployment-rate.htm"
+      content_type: "data"
+      language: "en"
+      region: "US"
   bea:
     enabled: false
     config:
